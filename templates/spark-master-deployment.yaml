@@ -80,3 +80,5 @@ spec:
             value: {{ default "1g" .Values.Master.DaemonMemory | quote }}
           - name: SPARK_MASTER_HOST
             value: {{ template "master-fullname" . }}
+          - name: SPARK_MASTER_PORT
+            value: {{ .Values.Master.ServicePort | quote }}
