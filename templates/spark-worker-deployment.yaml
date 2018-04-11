@@ -28,7 +28,9 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
           - >-
-            /usr/local/spark/sbin/start-slave.sh spark://{{ template "master-fullname" . }}:{{ .Values.Master.ServicePort }}
+            spark-class org.apache.spark.deploy.worker.Worker spark://{{ template "master-fullname" . }}:{{ .Values.Master.ServicePort }}
+          #- >-
+          #  /usr/local/spark/sbin/start-slave.sh spark://{{ template "master-fullname" . }}:{{ .Values.Master.ServicePort }}
           ports:
             - containerPort: {{ .Values.Worker.ContainerPort }}
           resources:
@@ -36,8 +38,6 @@ spec:
               cpu: "{{ .Values.Worker.Cpu }}"
               memory: "{{ .Values.Worker.Memory }}"
           env:
-          - name: SPARK_NO_DAEMONIZE
-            value: "true"
           - name: SPARK_DAEMON_MEMORY
             value: {{ default "1g" .Values.Worker.DaemonMemory | quote }}
           - name: SPARK_WORKER_MEMORY

@@ -61,7 +61,13 @@ spec:
           command: ["/bin/bash","-c"]
           args:
           - >-
-            echo $(hostname -i) {{ template "master-fullname" . }} >> /etc/hosts; /usr/local/spark/sbin/start-master.sh --host {{ template "master-fullname" . }}
+            echo $(hostname -i) {{ template "master-fullname" . }} >> /etc/hosts;
+            spark-class org.apache.spark.deploy.master.Master
+            --port {{ .Values.Master.ContainerPort }}
+            --webui-port {{ .Values.WebUi.ContainerPort }}
+            --host {{ template "master-fullname" . }}
+          #- >-
+          #  echo $(hostname -i) {{ template "master-fullname" . }} >> /etc/hosts; /usr/local/spark/sbin/start-master.sh --host {{ template "master-fullname" . }}
           ports:
             - containerPort: {{ .Values.Master.ContainerPort }}
             - containerPort: {{ .Values.WebUi.ContainerPort }}
@@ -70,13 +76,7 @@ spec:
               cpu: "{{ .Values.Master.Cpu }}"
               memory: "{{ .Values.Master.Memory }}"
           env:
-          - name: SPARK_NO_DAEMONIZE
-            value: "true"
           - name: SPARK_DAEMON_MEMORY
             value: {{ default "1g" .Values.Master.DaemonMemory | quote }}
           - name: SPARK_MASTER_HOST
             value: {{ template "master-fullname" . }}
-          - name: SPARK_MASTER_PORT
-            value: {{ .Values.Master.ServicePort | quote }}
-          - name: SPARK_MASTER_WEBUI_PORT
-            value: {{ .Values.WebUi.ContainerPort | quote }}
